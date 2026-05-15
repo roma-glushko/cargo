@@ -10,6 +10,7 @@ import (
 	"os/signal"
 
 	"github.com/urfave/cli/v2"
+	"golang.org/x/sync/errgroup"
 
 	"github.com/roma-glushko/cargo/internal/booking"
 	"github.com/roma-glushko/cargo/internal/cargo"
@@ -118,35 +119,42 @@ func Run(cCtx *cli.Context) error {
 	signalCtx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer stop()
 
-	go func() {
+	g, gCtx := errgroup.WithContext(signalCtx)
+
+	g.Go(func() error {
 		logger.Info("starting HTTP server", "addr", addr, "store", cCtx.String("store"))
 
 		if err := httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			logger.Error("HTTP server error", "error", err)
+			return fmt.Errorf("HTTP server: %w", err)
 		}
-	}()
 
-	go func() {
+		return nil
+	})
+
+	g.Go(func() error {
 		lis, err := net.Listen("tcp", grpcAddr)
-
 		if err != nil {
-			logger.Error("gRPC listen error", "error", err)
-			return
+			return fmt.Errorf("gRPC listen: %w", err)
 		}
 
 		logger.Info("starting gRPC server", "addr", grpcAddr)
 
 		if err := grpcServer.Serve(lis); err != nil {
-			logger.Error("gRPC server error", "error", err)
+			return fmt.Errorf("gRPC server: %w", err)
 		}
-	}()
 
-	<-signalCtx.Done()
-	logger.Info("shutting down")
+		return nil
+	})
 
-	grpcServer.GracefulStop()
+	g.Go(func() error {
+		<-gCtx.Done()
+		logger.Info("shutting down")
 
-	return httpServer.Shutdown(context.Background())
+		grpcServer.GracefulStop()
+		return httpServer.Shutdown(context.Background())
+	})
+
+	return g.Wait()
 }
 
 func initRepos(ctx context.Context, cCtx *cli.Context, logger *slog.Logger) (repos, func(), error) {
