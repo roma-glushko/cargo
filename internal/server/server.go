@@ -29,6 +29,10 @@ func New(booking *BookingHandler, tracking *TrackingHandler, handling *HandlingH
 	}))
 	s.router.Use(jsonContentType)
 
+	s.router.Get("/healthz", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	})
+
 	s.router.Route("/api", func(r chi.Router) {
 		r.Post("/cargos", booking.Book)
 		r.Get("/cargos", booking.List)
