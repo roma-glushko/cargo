@@ -1,0 +1,6 @@
+DROP TABLE IF EXISTS handling_events;
+DROP TABLE IF EXISTS legs;
+DROP TABLE IF EXISTS cargos;
+DROP TABLE IF EXISTS carrier_movements;
+DROP TABLE IF EXISTS voyages;
+DROP TABLE IF EXISTS locations;

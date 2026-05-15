@@ -15,6 +15,7 @@ func main() {
 				Name:    "run",
 				Aliases: []string{"r", "serve", "srv"},
 				Usage:   "run Cargo API server",
+				Flags:   cmd.RunFlags,
 				Action:  cmd.Run,
 			},
 		},

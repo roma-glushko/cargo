@@ -1,0 +1,12 @@
+version: "2"
+sql:
+  - engine: "postgresql"
+    queries: "internal/postgres/queries"
+    schema: "internal/postgres/migrations/001_create_tables.up.sql"
+    gen:
+      go:
+        package: "sqlcgen"
+        out: "internal/postgres/sqlcgen"
+        sql_package: "pgx/v5"
+        emit_json_tags: false
+        emit_empty_slices: true

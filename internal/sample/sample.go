@@ -28,8 +28,11 @@ func Populate(
 		}
 	}
 
-	if err := populateSampleCargos(ctx, cargos, events); err != nil {
-		return err
+	// Only seed sample cargos if they don't exist yet
+	if _, err := cargos.Find(ctx, "ABC123"); err != nil {
+		if err := populateSampleCargos(ctx, cargos, events); err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -49,6 +52,10 @@ func populateSampleCargos(ctx context.Context, cargos cargo.Repository, events c
 			{VoyageNumber: "0300A", LoadLocation: "USDAL", UnloadLocation: "FIHEL", LoadTime: ts(2009, 3, 9), UnloadTime: ts(2009, 3, 12)},
 		},
 	})
+
+	if err := cargos.Store(ctx, abc123); err != nil {
+		return err
+	}
 
 	abc123Events := []cargo.HandlingEvent{
 		mustEvent(cargo.Receive, "ABC123", "", "CNHKG", ts(2009, 3, 1)),
@@ -82,6 +89,10 @@ func populateSampleCargos(ctx context.Context, cargos cargo.Repository, events c
 			{VoyageNumber: "0300A", LoadLocation: "USDAL", UnloadLocation: "SESTO", LoadTime: ts(2009, 3, 9), UnloadTime: ts(2009, 3, 12)},
 		},
 	})
+
+	if err := cargos.Store(ctx, jkl567); err != nil {
+		return err
+	}
 
 	jkl567Events := []cargo.HandlingEvent{
 		mustEvent(cargo.Receive, "JKL567", "", "CNHGH", ts(2009, 3, 1)),
