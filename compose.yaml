@@ -1,23 +1,40 @@
-version: '3.9'
-
 services:
-  db:
+  postgres:
     image: postgres:16-alpine
-    container_name: postgresql
     environment:
       POSTGRES_USER: cargo
       POSTGRES_PASSWORD: shipthatpackage
       POSTGRES_DB: cargo
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U cargo"]
-      interval: 10s
-      timeout: 10s
+      interval: 2s
+      timeout: 3s
       retries: 10
 
+  api:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      CARGO_STORE: postgres
+      CARGO_DATABASE_URL: postgres://cargo:shipthatpackage@postgres:5432/cargo?sslmode=disable
+      CARGO_ADDR: ":8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  ui:
+    build: ui
+    ports:
+      - "5173:5173"
+    environment:
+      API_URL: http://api:8080
+    depends_on:
+      - api
+
 volumes:
-  postgres_data:
-    driver: local
+  pgdata:

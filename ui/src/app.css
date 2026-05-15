@@ -1,0 +1,277 @@
+:root {
+	--color-bg: #f8fafc;
+	--color-surface: #ffffff;
+	--color-primary: #1e40af;
+	--color-primary-light: #3b82f6;
+	--color-text: #1e293b;
+	--color-text-muted: #64748b;
+	--color-border: #e2e8f0;
+	--color-success: #16a34a;
+	--color-warning: #d97706;
+	--color-danger: #dc2626;
+	--radius: 6px;
+	--shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+	margin: 0;
+}
+
+body {
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+	background: var(--color-bg);
+	color: var(--color-text);
+	line-height: 1.5;
+}
+
+.shell {
+	display: grid;
+	grid-template-columns: 220px 1fr;
+	min-height: 100vh;
+}
+
+nav {
+	background: var(--color-primary);
+	color: white;
+	padding: 1.5rem 0;
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+}
+
+nav .brand {
+	font-size: 1.25rem;
+	font-weight: 700;
+	padding: 0 1.25rem 1rem;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+	margin-bottom: 0.5rem;
+}
+
+nav a {
+	color: rgba(255, 255, 255, 0.75);
+	text-decoration: none;
+	padding: 0.5rem 1.25rem;
+	font-size: 0.9rem;
+	transition: background 0.15s, color 0.15s;
+}
+
+nav a:hover,
+nav a.active {
+	background: rgba(255, 255, 255, 0.1);
+	color: white;
+}
+
+main {
+	padding: 2rem;
+	max-width: 1100px;
+}
+
+h1 {
+	font-size: 1.5rem;
+	font-weight: 600;
+	margin-bottom: 1.25rem;
+}
+
+h2 {
+	font-size: 1.15rem;
+	font-weight: 600;
+	margin-bottom: 0.75rem;
+}
+
+.card {
+	background: var(--color-surface);
+	border: 1px solid var(--color-border);
+	border-radius: var(--radius);
+	box-shadow: var(--shadow);
+	padding: 1.25rem;
+	margin-bottom: 1.25rem;
+}
+
+table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+th {
+	text-align: left;
+	font-size: 0.8rem;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	color: var(--color-text-muted);
+	padding: 0.5rem 0.75rem;
+	border-bottom: 2px solid var(--color-border);
+}
+
+td {
+	padding: 0.6rem 0.75rem;
+	border-bottom: 1px solid var(--color-border);
+	font-size: 0.9rem;
+}
+
+tr:hover td {
+	background: #f1f5f9;
+}
+
+.badge {
+	display: inline-block;
+	padding: 0.15rem 0.5rem;
+	border-radius: 99px;
+	font-size: 0.75rem;
+	font-weight: 600;
+}
+
+.badge-success {
+	background: #dcfce7;
+	color: var(--color-success);
+}
+
+.badge-warning {
+	background: #fef3c7;
+	color: var(--color-warning);
+}
+
+.badge-danger {
+	background: #fee2e2;
+	color: var(--color-danger);
+}
+
+.badge-muted {
+	background: #f1f5f9;
+	color: var(--color-text-muted);
+}
+
+button,
+.btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.35rem;
+	padding: 0.5rem 1rem;
+	border: none;
+	border-radius: var(--radius);
+	font-size: 0.875rem;
+	font-weight: 500;
+	cursor: pointer;
+	text-decoration: none;
+	transition: background 0.15s;
+}
+
+.btn-primary {
+	background: var(--color-primary);
+	color: white;
+}
+
+.btn-primary:hover {
+	background: var(--color-primary-light);
+}
+
+.btn-secondary {
+	background: var(--color-border);
+	color: var(--color-text);
+}
+
+.btn-secondary:hover {
+	background: #cbd5e1;
+}
+
+.btn-danger {
+	background: var(--color-danger);
+	color: white;
+}
+
+.btn-sm {
+	padding: 0.3rem 0.6rem;
+	font-size: 0.8rem;
+}
+
+.form-group {
+	margin-bottom: 1rem;
+}
+
+label {
+	display: block;
+	font-size: 0.85rem;
+	font-weight: 500;
+	margin-bottom: 0.3rem;
+	color: var(--color-text-muted);
+}
+
+input,
+select {
+	width: 100%;
+	padding: 0.5rem 0.75rem;
+	border: 1px solid var(--color-border);
+	border-radius: var(--radius);
+	font-size: 0.9rem;
+	background: white;
+}
+
+input:focus,
+select:focus {
+	outline: none;
+	border-color: var(--color-primary-light);
+	box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
+}
+
+.error-box {
+	background: #fee2e2;
+	color: var(--color-danger);
+	padding: 0.75rem 1rem;
+	border-radius: var(--radius);
+	font-size: 0.9rem;
+	margin-bottom: 1rem;
+}
+
+.success-box {
+	background: #dcfce7;
+	color: var(--color-success);
+	padding: 0.75rem 1rem;
+	border-radius: var(--radius);
+	font-size: 0.9rem;
+	margin-bottom: 1rem;
+}
+
+.row {
+	display: flex;
+	gap: 1rem;
+	align-items: flex-start;
+}
+
+.row > * {
+	flex: 1;
+}
+
+.actions {
+	display: flex;
+	gap: 0.5rem;
+	margin-top: 1rem;
+}
+
+.detail-grid {
+	display: grid;
+	grid-template-columns: 140px 1fr;
+	gap: 0.4rem 1rem;
+	font-size: 0.9rem;
+}
+
+.detail-grid dt {
+	color: var(--color-text-muted);
+	font-weight: 500;
+}
+
+.spinner {
+	color: var(--color-text-muted);
+	font-size: 0.9rem;
+}
+
+a {
+	color: var(--color-primary);
+}
+
+.mono {
+	font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', monospace;
+	font-size: 0.85rem;
+}
