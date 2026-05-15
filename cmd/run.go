@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"net"
 	"net/http"
 	"os"
 	"os/signal"
@@ -13,6 +14,7 @@ import (
 	"github.com/roma-glushko/cargo/internal/booking"
 	"github.com/roma-glushko/cargo/internal/cargo"
 	"github.com/roma-glushko/cargo/internal/eventbus"
+	"github.com/roma-glushko/cargo/internal/grpcapi"
 	"github.com/roma-glushko/cargo/internal/handling"
 	"github.com/roma-glushko/cargo/internal/inmem"
 	"github.com/roma-glushko/cargo/internal/inspection"
@@ -42,6 +44,12 @@ var RunFlags = []cli.Flag{
 		Value:   ":8080",
 		Usage:   "HTTP listen address",
 		EnvVars: []string{"CARGO_ADDR"},
+	},
+	&cli.StringFlag{
+		Name:    "grpc-addr",
+		Value:   ":9090",
+		Usage:   "gRPC listen address",
+		EnvVars: []string{"CARGO_GRPC_ADDR"},
 	},
 }
 
@@ -90,6 +98,7 @@ func Run(cCtx *cli.Context) error {
 	bus.Start()
 	defer bus.Stop()
 
+	// HTTP server
 	bookingHandler := server.NewBookingHandler(bookingService, r.cargos, r.locations)
 	trackingHandler := server.NewTrackingHandler(r.cargos, r.events)
 	handlingHandler := server.NewHandlingHandler(handlingService)
@@ -102,18 +111,40 @@ func Run(cCtx *cli.Context) error {
 		Handler: srv,
 	}
 
+	// gRPC server
+	grpcAddr := cCtx.String("grpc-addr")
+	grpcServer := grpcapi.NewServer(bookingService, handlingService, r.cargos, r.locations, r.events)
+
 	signalCtx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer stop()
 
 	go func() {
-		logger.Info("starting server", "addr", addr, "store", cCtx.String("store"))
+		logger.Info("starting HTTP server", "addr", addr, "store", cCtx.String("store"))
+
 		if err := httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			logger.Error("server error", "error", err)
+			logger.Error("HTTP server error", "error", err)
+		}
+	}()
+
+	go func() {
+		lis, err := net.Listen("tcp", grpcAddr)
+
+		if err != nil {
+			logger.Error("gRPC listen error", "error", err)
+			return
+		}
+
+		logger.Info("starting gRPC server", "addr", grpcAddr)
+
+		if err := grpcServer.Serve(lis); err != nil {
+			logger.Error("gRPC server error", "error", err)
 		}
 	}()
 
 	<-signalCtx.Done()
 	logger.Info("shutting down")
+
+	grpcServer.GracefulStop()
 
 	return httpServer.Shutdown(context.Background())
 }

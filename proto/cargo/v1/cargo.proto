@@ -1,0 +1,137 @@
+syntax = "proto3";
+
+package cargo.v1;
+
+option go_package = "github.com/roma-glushko/cargo/gen/cargo/v1;cargov1";
+
+import "google/protobuf/timestamp.proto";
+
+message Leg {
+  string voyage_number = 1;
+  string from = 2;
+  string to = 3;
+  google.protobuf.Timestamp load_time = 4;
+  google.protobuf.Timestamp unload_time = 5;
+}
+
+message Cargo {
+  string tracking_id = 1;
+  string origin = 2;
+  string destination = 3;
+  google.protobuf.Timestamp arrival_deadline = 4;
+  bool misrouted = 5;
+  bool routed = 6;
+  repeated Leg legs = 7;
+}
+
+message Location {
+  string un_locode = 1;
+  string name = 2;
+}
+
+message Itinerary {
+  repeated Leg legs = 1;
+}
+
+message HandlingEvent {
+  string location = 1;
+  google.protobuf.Timestamp completion_time = 2;
+  string type = 3;
+  string voyage_number = 4;
+  bool is_expected = 5;
+  string description = 6;
+}
+
+message BookCargoRequest {
+  string origin = 1;
+  string destination = 2;
+  google.protobuf.Timestamp arrival_deadline = 3;
+}
+
+message BookCargoResponse {
+  string tracking_id = 1;
+}
+
+message ListCargosRequest {}
+
+message ListCargosResponse {
+  repeated Cargo cargos = 1;
+}
+
+message GetCargoRequest {
+  string tracking_id = 1;
+}
+
+message GetCargoResponse {
+  Cargo cargo = 1;
+}
+
+message RequestRoutesRequest {
+  string tracking_id = 1;
+}
+
+message RequestRoutesResponse {
+  repeated Itinerary itineraries = 1;
+}
+
+message AssignRouteRequest {
+  string tracking_id = 1;
+  repeated Leg legs = 2;
+}
+
+message AssignRouteResponse {}
+
+message ChangeDestinationRequest {
+  string tracking_id = 1;
+  string destination = 2;
+}
+
+message ChangeDestinationResponse {}
+
+message ListLocationsRequest {}
+
+message ListLocationsResponse {
+  repeated Location locations = 1;
+}
+
+service BookingService {
+  rpc BookCargo(BookCargoRequest) returns (BookCargoResponse);
+  rpc ListCargos(ListCargosRequest) returns (ListCargosResponse);
+  rpc GetCargo(GetCargoRequest) returns (GetCargoResponse);
+  rpc RequestRoutes(RequestRoutesRequest) returns (RequestRoutesResponse);
+  rpc AssignRoute(AssignRouteRequest) returns (AssignRouteResponse);
+  rpc ChangeDestination(ChangeDestinationRequest) returns (ChangeDestinationResponse);
+  rpc ListLocations(ListLocationsRequest) returns (ListLocationsResponse);
+}
+
+message TrackCargoRequest {
+  string tracking_id = 1;
+}
+
+message TrackCargoResponse {
+  string tracking_id = 1;
+  string status_text = 2;
+  string destination = 3;
+  optional google.protobuf.Timestamp eta = 4;
+  optional string next_expected_activity = 5;
+  bool is_misdirected = 6;
+  repeated HandlingEvent events = 7;
+}
+
+service TrackingService {
+  rpc TrackCargo(TrackCargoRequest) returns (TrackCargoResponse);
+}
+
+message RegisterHandlingEventRequest {
+  repeated string tracking_ids = 1;
+  string type = 2;
+  string un_locode = 3;
+  google.protobuf.Timestamp completion_time = 4;
+  string voyage_number = 5;
+}
+
+message RegisterHandlingEventResponse {}
+
+service HandlingService {
+  rpc RegisterHandlingEvent(RegisterHandlingEventRequest) returns (RegisterHandlingEventResponse);
+}

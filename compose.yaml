@@ -19,10 +19,12 @@ services:
     build: .
     ports:
       - "8080:8080"
+      - "9090:9090"
     environment:
       CARGO_STORE: postgres
       CARGO_DATABASE_URL: postgres://cargo:shipthatpackage@postgres:5432/cargo?sslmode=disable
       CARGO_ADDR: ":8080"
+      CARGO_GRPC_ADDR: ":9090"
     depends_on:
       postgres:
         condition: service_healthy
